@@ -2359,7 +2359,7 @@ CopyFrom(CopyState cstate)
 		if (cstate->rel->rd_createSubid != GetCurrentSubTransactionId() &&
 		 cstate->rel->rd_newRelfilenodeSubid != GetCurrentSubTransactionId())
 			ereport(ERROR,
-					(errcode(ERRCODE_INVALID_TRANSACTION_STATE),
+					(errcode(ERRCODE_OBJECT_NOT_IN_PREREQUISITE_STATE),
 					 errmsg("cannot perform FREEZE because the table was not created or truncated in the current subtransaction")));
 
 		hi_options |= HEAP_INSERT_FROZEN;

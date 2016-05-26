@@ -45,6 +45,10 @@
  * We support subscripting on these types, but array_in() and array_out()
  * only work with varlena arrays.
  *
+ * In addition, arrays are a major user of the "expanded object" TOAST
+ * infrastructure.  This allows a varlena array to be converted to a
+ * separate representation that may include "deconstructed" Datum/isnull
+ * arrays holding the elements.
  *
  * Portions Copyright (c) 1996-2015, PostgreSQL Global Development Group
  * Portions Copyright (c) 1994, Regents of the University of California
@@ -250,7 +254,7 @@ typedef struct ArrayIteratorData *ArrayIterator;
 #define PG_GETARG_ANY_ARRAY(n)	DatumGetAnyArray(PG_GETARG_DATUM(n))
 
 /*
- * Access macros for array header fields.
+ * Access macros for varlena array header fields.
  *
  * ARR_DIMS returns a pointer to an array of array dimensions (number of
  * elements along the various array axes).

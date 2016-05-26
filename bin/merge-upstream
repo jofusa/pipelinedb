@@ -75,6 +75,8 @@ def list_files(path):
     # Ignore any PipelineDB files.
     if (_dir.startswith('bin') or
         _dir.startswith('pkg') or
+        _dir.startswith('src/bin/pipeline') or
+        _dir.startswith('src/bin/recv-alerts') or
         _dir.startswith('src/backend/pipeline') or
         _dir.startswith('src/include/pipeline') or
         _dir.startswith('src/test/unit') or
@@ -166,10 +168,10 @@ def main(args):
   print 'Generating diffs against upstream files for mismatching files...'
   need_merge = []
   progress = progressbar.ProgressBar()
-  remaining = len(upstream_files)
+  completed = 0
   default_action = 'c'
   for rel_path in progress(upstream_files):
-    remaining -= 1
+    completed += 1
     upstream_path = os.path.join(upstream_root, rel_path)
     local_path = os.path.join(local_root, rel_path)
 
@@ -218,7 +220,12 @@ def main(args):
     safe_mkdirs(subdir)
 
     # Give the option to simply clobber the local copy as this is a common case
-    print '%s%s' % (local_path, '=' * 80)
+    print
+    print '=' * 80
+    print local_path
+    print '=' * 80
+    print
+
     for line in diff_lines:
       if re.match('\-[^\-]', line):
         print colored(line, 'red')
@@ -226,15 +233,25 @@ def main(args):
         print colored(line, 'green')
       else:
         print line
-    print '%s%s' % (local_path, '=' * 80)
 
-    action = raw_input('(c)lobber or (m)anual merge? [%s] (%d/%d)' % (default_action, remaining, len(upstream_files)))
-    if not action:
-      action = default_action
+    print
+    print '=' * 80
+    print local_path
+    print '=' * 80
+    print
+
+    while True:
+      action = raw_input('(c)lobber, (k)eep or (m)anual merge? [%s] (%d/%d): ' % (default_action, completed, len(upstream_files)))
+      if not action:
+        action = default_action
+      if action in ['c', 'k', 'm']:
+        break
     default_action = action
 
     if action == 'c':
       shutil.copyfile(upstream_path, local_path)
+      continue
+    if action == 'k':
       continue
 
     with open(diff_path, 'w+') as f:

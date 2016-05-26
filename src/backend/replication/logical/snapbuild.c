@@ -635,8 +635,6 @@ SnapBuildClearExportedSnapshot()
 bool
 SnapBuildProcessChange(SnapBuild *builder, TransactionId xid, XLogRecPtr lsn)
 {
-	bool		is_old_tx;
-
 	/*
 	 * We can't handle data in transactions if we haven't built a snapshot
 	 * yet, so don't store them.
@@ -657,9 +655,7 @@ SnapBuildProcessChange(SnapBuild *builder, TransactionId xid, XLogRecPtr lsn)
 	 * If the reorderbuffer doesn't yet have a snapshot, add one now, it will
 	 * be needed to decode the change we're currently processing.
 	 */
-	is_old_tx = ReorderBufferIsXidKnown(builder->reorder, xid);
-
-	if (!is_old_tx || !ReorderBufferXidHasBaseSnapshot(builder->reorder, xid))
+	if (!ReorderBufferXidHasBaseSnapshot(builder->reorder, xid))
 	{
 		/* only build a new snapshot if we don't have a prebuilt one */
 		if (builder->snapshot == NULL)
@@ -900,7 +896,7 @@ SnapBuildEndTxn(SnapBuild *builder, XLogRecPtr lsn, TransactionId xid)
 			 * None of the originally running transaction is running anymore,
 			 * so our incrementaly built snapshot now is consistent.
 			 */
-			ereport(DEBUG1,
+			ereport(LOG,
 				  (errmsg("logical decoding found consistent point at %X/%X",
 						  (uint32) (lsn >> 32), (uint32) lsn),
 				   errdetail("Transaction ID %u finished; no more running transactions.",
@@ -1265,7 +1261,7 @@ SnapBuildFindSnapshot(SnapBuild *builder, XLogRecPtr lsn, xl_running_xacts *runn
 
 		builder->state = SNAPBUILD_CONSISTENT;
 
-		ereport(DEBUG1,
+		ereport(LOG,
 				(errmsg("logical decoding found consistent point at %X/%X",
 						(uint32) (lsn >> 32), (uint32) lsn),
 				 errdetail("There are no running transactions.")));

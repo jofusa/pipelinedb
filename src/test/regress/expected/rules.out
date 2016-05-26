@@ -2115,58 +2115,6 @@ pg_views| SELECT n.nspname AS schemaname,
    FROM (pg_class c
      LEFT JOIN pg_namespace n ON ((n.oid = c.relnamespace)))
   WHERE (c.relkind = 'v'::"char");
-pipeline_proc_stats| SELECT cq_proc_stat_get.type,
-    cq_proc_stat_get.pid,
-    cq_proc_stat_get.start_time,
-    cq_proc_stat_get.input_rows,
-    cq_proc_stat_get.output_rows,
-    cq_proc_stat_get.updated_rows,
-    cq_proc_stat_get.input_bytes,
-    cq_proc_stat_get.output_bytes,
-    cq_proc_stat_get.updated_bytes,
-    cq_proc_stat_get.executions,
-    cq_proc_stat_get.tuples_ps,
-    cq_proc_stat_get.bytes_ps,
-    cq_proc_stat_get.time_pb,
-    cq_proc_stat_get.tuples_pb,
-    cq_proc_stat_get.memory,
-    cq_proc_stat_get.errors
-   FROM cq_proc_stat_get() cq_proc_stat_get(type, pid, start_time, input_rows, output_rows, updated_rows, input_bytes, output_bytes, updated_bytes, tuples_ps, bytes_ps, time_pb, tuples_pb, memory, executions, errors)
-  ORDER BY cq_proc_stat_get.type, cq_proc_stat_get.pid;
-pipeline_query_stats| SELECT cq_stat_get.name,
-    cq_stat_get.type,
-    cq_stat_get.input_rows,
-    cq_stat_get.output_rows,
-    cq_stat_get.updated_rows,
-    cq_stat_get.input_bytes,
-    cq_stat_get.output_bytes,
-    cq_stat_get.updated_bytes,
-    cq_stat_get.tuples_ps,
-    cq_stat_get.bytes_ps,
-    cq_stat_get.time_pb,
-    cq_stat_get.tuples_pb,
-    cq_stat_get.errors
-   FROM cq_stat_get() cq_stat_get(name, type, input_rows, output_rows, updated_rows, input_bytes, output_bytes, updated_bytes, tuples_ps, bytes_ps, time_pb, tuples_pb, errors)
-  ORDER BY cq_stat_get.name, cq_stat_get.type;
-pipeline_stats| SELECT pipeline_stat_get.type,
-    pipeline_stat_get.start_time,
-    pipeline_stat_get.input_rows,
-    pipeline_stat_get.output_rows,
-    pipeline_stat_get.updated_rows,
-    pipeline_stat_get.input_bytes,
-    pipeline_stat_get.output_bytes,
-    pipeline_stat_get.updated_bytes,
-    pipeline_stat_get.executions,
-    pipeline_stat_get.errors,
-    pipeline_stat_get.cv_create,
-    pipeline_stat_get.cv_drop
-   FROM pipeline_stat_get() pipeline_stat_get(type, start_time, input_rows, output_rows, updated_rows, input_bytes, output_bytes, updated_bytes, executions, errors, cv_create, cv_drop);
-pipeline_stream_stats| SELECT stream_stat_get.schema,
-    stream_stat_get.name,
-    stream_stat_get.input_rows,
-    stream_stat_get.input_batches,
-    stream_stat_get.input_bytes
-   FROM stream_stat_get() stream_stat_get(schema, name, input_rows, input_batches, input_bytes);
 rtest_v1| SELECT rtest_t1.a,
     rtest_t1.b
    FROM rtest_t1;
@@ -2884,7 +2832,7 @@ SELECT definition FROM pg_rules WHERE tablename = 'hats' ORDER BY rulename;
  CREATE RULE hat_nosert AS                                                                  +
      ON INSERT TO hats DO INSTEAD  INSERT INTO hat_data (hat_name, hat_color)               +
    VALUES (new.hat_name, new.hat_color) ON CONFLICT(hat_name COLLATE "C" bpchar_pattern_ops)+
-   WHERE (hat_data.hat_color = 'green'::bpchar) DO NOTHING                                  +
+   WHERE (hat_color = 'green'::bpchar) DO NOTHING                                           +
    RETURNING hat_data.hat_name,                                                             +
      hat_data.hat_color;
 (1 row)
@@ -2909,7 +2857,7 @@ SELECT tablename, rulename, definition FROM pg_rules
  hats      | hat_nosert | CREATE RULE hat_nosert AS                                                                  +
            |            |     ON INSERT TO hats DO INSTEAD  INSERT INTO hat_data (hat_name, hat_color)               +
            |            |   VALUES (new.hat_name, new.hat_color) ON CONFLICT(hat_name COLLATE "C" bpchar_pattern_ops)+
-           |            |   WHERE (hat_data.hat_color = 'green'::bpchar) DO NOTHING                                  +
+           |            |   WHERE (hat_color = 'green'::bpchar) DO NOTHING                                           +
            |            |   RETURNING hat_data.hat_name,                                                             +
            |            |     hat_data.hat_color;
 (1 row)

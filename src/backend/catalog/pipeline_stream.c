@@ -33,6 +33,7 @@
 #include "parser/parse_target.h"
 #include "parser/analyze.h"
 #include "pipeline/cont_analyze.h"
+#include "pipeline/stream.h"
 #include "utils/builtins.h"
 #include "tcop/tcopprot.h"
 #include "utils/guc.h"

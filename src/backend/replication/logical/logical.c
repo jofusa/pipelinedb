@@ -32,7 +32,7 @@
 
 #include "access/xact.h"
 #include "access/xlog_internal.h"
-#include "pipeline/cont_scheduler.h"
+
 #include "replication/decode.h"
 #include "replication/logical.h"
 #include "replication/reorderbuffer.h"
@@ -137,16 +137,7 @@ StartupDecodingContext(List *output_plugin_options,
 	 * (re-)load output plugins, so we detect a bad (removed) output plugin
 	 * now.
 	 */
-
-	/*
-	 * XXX(jasonm): An empty string means this is not a dynamically
-	 * loaded plugin. We utilise this for continuous triggers.
-	 */
-
-	if (strlen(NameStr(slot->data.plugin)))
-		LoadOutputPlugin(&ctx->callbacks, NameStr(slot->data.plugin));
-	else
-		Assert(IsContQueryTriggerProcess());
+	LoadOutputPlugin(&ctx->callbacks, NameStr(slot->data.plugin));
 
 	/*
 	 * Now that the slot's xmin has been set, we can announce ourselves as a
@@ -430,7 +421,7 @@ CreateDecodingContext(XLogRecPtr start_lsn,
 		startup_cb_wrapper(ctx, &ctx->options, false);
 	MemoryContextSwitchTo(old_context);
 
-	ereport(DEBUG1,
+	ereport(LOG,
 			(errmsg("starting logical decoding for slot \"%s\"",
 					NameStr(slot->data.name)),
 			 errdetail("streaming transactions committing after %X/%X, reading WAL from %X/%X",

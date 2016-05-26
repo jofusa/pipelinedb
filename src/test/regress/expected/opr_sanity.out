@@ -58,12 +58,9 @@ WHERE p1.prolang = 0 OR p1.prorettype = 0 OR
        0::oid = ANY (p1.proargtypes) OR
        procost <= 0 OR
        CASE WHEN proretset THEN prorows <= 0 ELSE prorows != 0 END;
- oid  |      proname       
-------+--------------------
- 4324 | hll_agg_transp
- 4342 | tdigest_agg_transp
- 4408 | fss_topk
-(3 rows)
+ oid | proname 
+-----+---------
+(0 rows)
 
 -- prosrc should never be null or empty
 SELECT p1.oid, p1.proname
@@ -199,10 +196,9 @@ ORDER BY 1, 2;
  proargtypes | proargtypes 
 -------------+-------------
           23 |          28
-          25 |        2283
         1114 |        1184
         1560 |        1562
-(4 rows)
+(3 rows)
 
 SELECT DISTINCT p1.proargtypes[2], p2.proargtypes[2]
 FROM pg_proc AS p1, pg_proc AS p2
@@ -286,17 +282,10 @@ SELECT p1.oid, p1.proname
 FROM pg_proc as p1
 WHERE p1.prorettype = 'internal'::regtype AND NOT
     'internal'::regtype = ANY (p1.proargtypes);
- oid  |        proname         
-------+------------------------
+ oid  |   proname   
+------+-------------
  2304 | internal_in
- 5021 | cqosastaterecv
- 4308 | naggstaterecv
- 4310 | arrayaggstaterecv
- 4313 | byteatostringinfo
- 4320 | stringaggstaterecv
- 4473 | first_values_recv
- 4482 | arrayaggarraystaterecv
-(8 rows)
+(1 row)
 
 -- Look for functions that return a polymorphic type and do not have any
 -- polymorphic argument.  Calls of such functions would be unresolvable
@@ -314,8 +303,8 @@ WHERE p1.prorettype IN
      'anyenum'::regtype = ANY (p1.proargtypes) OR
      'anyrange'::regtype = ANY (p1.proargtypes))
 ORDER BY 2;
- oid  |        proname         
-------+------------------------
+ oid  |    proname     
+------+----------------
  2296 | anyarray_in
  2502 | anyarray_recv
  2312 | anyelement_in
@@ -326,14 +315,9 @@ ORDER BY 2;
  2400 | array_recv
  3506 | enum_in
  3532 | enum_recv
- 4469 | first_values
- 4474 | first_values_final
- 4415 | fss_topk_freqs
- 4414 | fss_topk_values
- 4460 | keyed_min_max_finalize
  3834 | range_in
  3836 | range_recv
-(17 rows)
+(12 rows)
 
 -- Check for length inconsistencies between the various argument-info arrays.
 SELECT p1.oid, p1.proname
@@ -392,11 +376,9 @@ WHERE proallargtypes IS NOT NULL AND
   ARRAY(SELECT proallargtypes[i]
         FROM generate_series(1, array_length(proallargtypes, 1)) g(i)
         WHERE proargmodes IS NULL OR proargmodes[i] IN ('i', 'b', 'v'));
- oid  |   proname    | proargtypes | proallargtypes | proargmodes 
-------+--------------+-------------+----------------+-------------
- 4408 | fss_topk     | 5041        | {2283,23}      | {o,o}
- 4469 | first_values | 23          | {2283}         | {v}
-(2 rows)
+ oid | proname | proargtypes | proallargtypes | proargmodes 
+-----+---------+-------------+----------------+-------------
+(0 rows)
 
 -- Check for protransform functions with the wrong signature
 SELECT p1.oid, p1.proname, p2.oid, p2.proname
@@ -1174,11 +1156,9 @@ SELECT oid, proname
 FROM pg_proc as p
 WHERE p.proisagg AND
     NOT EXISTS (SELECT 1 FROM pg_aggregate a WHERE a.aggfnoid = p.oid);
- oid  | proname  
-------+----------
- 4300 | combine
- 4388 | finalize
-(2 rows)
+ oid | proname 
+-----+---------
+(0 rows)
 
 -- If there is no finalfn then the output type must be the transtype.
 SELECT a.aggfnoid::oid, p.proname
@@ -1210,50 +1190,9 @@ WHERE a.aggfnoid = p.oid AND
          NOT physically_coercible(p.proargtypes[2], ptr.proargtypes[3]))
      -- we could carry the check further, but 3 args is enough for now
     );
- aggfnoid |   proname    | oid  |      proname       
-----------+--------------+------+--------------------
-     4322 | hll_agg      | 4324 | hll_agg_transp
-     4340 | tdigest_agg  | 4342 | tdigest_agg_transp
-     4420 | keyed_min    | 4458 | keyed_min_trans
-     4421 | keyed_min    | 4458 | keyed_min_trans
-     4422 | keyed_min    | 4458 | keyed_min_trans
-     4423 | keyed_min    | 4458 | keyed_min_trans
-     4424 | keyed_min    | 4458 | keyed_min_trans
-     4425 | keyed_min    | 4458 | keyed_min_trans
-     4426 | keyed_min    | 4458 | keyed_min_trans
-     4427 | keyed_min    | 4458 | keyed_min_trans
-     4428 | keyed_min    | 4458 | keyed_min_trans
-     4429 | keyed_min    | 4458 | keyed_min_trans
-     4430 | keyed_min    | 4458 | keyed_min_trans
-     4431 | keyed_min    | 4458 | keyed_min_trans
-     4432 | keyed_min    | 4458 | keyed_min_trans
-     4433 | keyed_min    | 4458 | keyed_min_trans
-     4434 | keyed_min    | 4458 | keyed_min_trans
-     4435 | keyed_min    | 4458 | keyed_min_trans
-     4436 | keyed_min    | 4458 | keyed_min_trans
-     4437 | keyed_min    | 4458 | keyed_min_trans
-     4438 | keyed_min    | 4458 | keyed_min_trans
-     4439 | keyed_max    | 4459 | keyed_max_trans
-     4440 | keyed_max    | 4459 | keyed_max_trans
-     4441 | keyed_max    | 4459 | keyed_max_trans
-     4442 | keyed_max    | 4459 | keyed_max_trans
-     4443 | keyed_max    | 4459 | keyed_max_trans
-     4444 | keyed_max    | 4459 | keyed_max_trans
-     4445 | keyed_max    | 4459 | keyed_max_trans
-     4446 | keyed_max    | 4459 | keyed_max_trans
-     4447 | keyed_max    | 4459 | keyed_max_trans
-     4448 | keyed_max    | 4459 | keyed_max_trans
-     4449 | keyed_max    | 4459 | keyed_max_trans
-     4450 | keyed_max    | 4459 | keyed_max_trans
-     4451 | keyed_max    | 4459 | keyed_max_trans
-     4452 | keyed_max    | 4459 | keyed_max_trans
-     4453 | keyed_max    | 4459 | keyed_max_trans
-     4454 | keyed_max    | 4459 | keyed_max_trans
-     4455 | keyed_max    | 4459 | keyed_max_trans
-     4456 | keyed_max    | 4459 | keyed_max_trans
-     4457 | keyed_max    | 4459 | keyed_max_trans
-     4469 | first_values | 4470 | first_values_trans
-(41 rows)
+ aggfnoid | proname | oid | proname 
+----------+---------+-----+---------
+(0 rows)
 
 -- Cross-check finalfn (if present) against its entry in pg_proc.
 SELECT a.aggfnoid::oid, p.proname, pfn.oid, pfn.proname
@@ -1273,53 +1212,9 @@ WHERE a.aggfnoid = p.oid AND
          NOT binary_coercible(p.proargtypes[2], pfn.proargtypes[3]))
      -- we could carry the check further, but 3 args is enough for now
     );
- aggfnoid |       proname       | oid  |             proname             
-----------+---------------------+------+---------------------------------
-     5002 | cq_percent_rank     | 5004 | cq_percent_rank_final
-     5005 | cq_cume_dist        | 5007 | cq_cume_dist_final
-     5014 | hll_count_distinct  | 5019 | hll_count_distinct_final
-     5023 | cq_percentile_cont  | 5027 | cq_percentile_cont_float8_final
-     4420 | keyed_min           | 4460 | keyed_min_max_finalize
-     4421 | keyed_min           | 4460 | keyed_min_max_finalize
-     4422 | keyed_min           | 4460 | keyed_min_max_finalize
-     4423 | keyed_min           | 4460 | keyed_min_max_finalize
-     4424 | keyed_min           | 4460 | keyed_min_max_finalize
-     4425 | keyed_min           | 4460 | keyed_min_max_finalize
-     4426 | keyed_min           | 4460 | keyed_min_max_finalize
-     4427 | keyed_min           | 4460 | keyed_min_max_finalize
-     4428 | keyed_min           | 4460 | keyed_min_max_finalize
-     4429 | keyed_min           | 4460 | keyed_min_max_finalize
-     4430 | keyed_min           | 4460 | keyed_min_max_finalize
-     4431 | keyed_min           | 4460 | keyed_min_max_finalize
-     4432 | keyed_min           | 4460 | keyed_min_max_finalize
-     4433 | keyed_min           | 4460 | keyed_min_max_finalize
-     4434 | keyed_min           | 4460 | keyed_min_max_finalize
-     4435 | keyed_min           | 4460 | keyed_min_max_finalize
-     4436 | keyed_min           | 4460 | keyed_min_max_finalize
-     4437 | keyed_min           | 4460 | keyed_min_max_finalize
-     4438 | keyed_min           | 4460 | keyed_min_max_finalize
-     4439 | keyed_max           | 4460 | keyed_min_max_finalize
-     4440 | keyed_max           | 4460 | keyed_min_max_finalize
-     4441 | keyed_max           | 4460 | keyed_min_max_finalize
-     4442 | keyed_max           | 4460 | keyed_min_max_finalize
-     4443 | keyed_max           | 4460 | keyed_min_max_finalize
-     4444 | keyed_max           | 4460 | keyed_min_max_finalize
-     4445 | keyed_max           | 4460 | keyed_min_max_finalize
-     4446 | keyed_max           | 4460 | keyed_min_max_finalize
-     4447 | keyed_max           | 4460 | keyed_min_max_finalize
-     4448 | keyed_max           | 4460 | keyed_min_max_finalize
-     4449 | keyed_max           | 4460 | keyed_min_max_finalize
-     4450 | keyed_max           | 4460 | keyed_min_max_finalize
-     4451 | keyed_max           | 4460 | keyed_min_max_finalize
-     4452 | keyed_max           | 4460 | keyed_min_max_finalize
-     4453 | keyed_max           | 4460 | keyed_min_max_finalize
-     4454 | keyed_max           | 4460 | keyed_min_max_finalize
-     4455 | keyed_max           | 4460 | keyed_min_max_finalize
-     4456 | keyed_max           | 4460 | keyed_min_max_finalize
-     4457 | keyed_max           | 4460 | keyed_min_max_finalize
-     4463 | set_agg             | 2334 | array_agg_finalfn
-     4476 | json_object_int_sum | 4478 | json_object_int_sum_transout
-(44 rows)
+ aggfnoid | proname | oid | proname 
+----------+---------+-----+---------
+(0 rows)
 
 -- If transfn is strict then either initval should be non-NULL, or
 -- input type should match transtype so that the first non-null input
@@ -1460,16 +1355,14 @@ SELECT DISTINCT proname, oprname
 FROM pg_operator AS o, pg_aggregate AS a, pg_proc AS p
 WHERE a.aggfnoid = p.oid AND a.aggsortop = o.oid
 ORDER BY 1, 2;
-  proname  | oprname 
------------+---------
- bool_and  | <
- bool_or   | >
- every     | <
- keyed_max | >
- keyed_min | >
- max       | >
- min       | <
-(7 rows)
+ proname  | oprname 
+----------+---------
+ bool_and | <
+ bool_or  | >
+ every    | <
+ max      | >
+ min      | <
+(5 rows)
 
 -- Check datatypes match
 SELECT a.aggfnoid::oid, o.oid
@@ -1477,47 +1370,9 @@ FROM pg_operator AS o, pg_aggregate AS a, pg_proc AS p
 WHERE a.aggfnoid = p.oid AND a.aggsortop = o.oid AND
     (oprkind != 'b' OR oprresult != 'boolean'::regtype
      OR oprleft != p.proargtypes[0] OR oprright != p.proargtypes[0]);
- aggfnoid | oid  
-----------+------
-     4420 |  413
-     4421 |  521
-     4422 |  520
-     4423 |  610
-     4424 |  623
-     4425 |  674
-     4426 |  563
-     4427 | 1097
-     4428 | 1112
-     4429 | 1554
-     4430 |  903
-     4431 | 2064
-     4432 | 1324
-     4433 | 1334
-     4434 |  666
-     4435 | 1756
-     4436 | 1060
-     4437 | 2800
-     4438 | 3519
-     4439 |  521
-     4440 |  520
-     4441 |  610
-     4442 |  623
-     4443 |  674
-     4444 |  563
-     4445 | 1097
-     4446 | 1112
-     4447 | 1554
-     4448 |  903
-     4449 | 2064
-     4450 | 1324
-     4451 | 1334
-     4452 |  666
-     4453 | 1756
-     4454 | 1060
-     4455 | 2800
-     4456 |  413
-     4457 | 3519
-(38 rows)
+ aggfnoid | oid 
+----------+-----
+(0 rows)
 
 -- Check operator is a suitable btree opfamily member
 SELECT a.aggfnoid::oid, o.oid
@@ -1540,16 +1395,14 @@ WHERE a.aggfnoid = p.oid AND a.aggsortop = o.oid AND
     amopopr = o.oid AND
     amopmethod = (SELECT oid FROM pg_am WHERE amname = 'btree')
 ORDER BY 1, 2;
-  proname  | oprname | amopstrategy 
------------+---------+--------------
- bool_and  | <       |            1
- bool_or   | >       |            5
- every     | <       |            1
- keyed_max | >       |            5
- keyed_min | >       |            5
- max       | >       |            5
- min       | <       |            1
-(7 rows)
+ proname  | oprname | amopstrategy 
+----------+---------+--------------
+ bool_and | <       |            1
+ bool_or  | >       |            5
+ every    | <       |            1
+ max      | >       |            5
+ min      | <       |            1
+(5 rows)
 
 -- Check that there are not aggregates with the same name and different
 -- numbers of arguments.  While not technically wrong, we have a project policy
@@ -1565,15 +1418,10 @@ WHERE p1.oid < p2.oid AND p1.proname = p2.proname AND
     p1.proisagg AND p2.proisagg AND
     array_dims(p1.proargtypes) != array_dims(p2.proargtypes)
 ORDER BY 1;
-              oid              |                            oid                             
--------------------------------+------------------------------------------------------------
- count("any")                  | count()
- hll_agg(anyelement)           | hll_agg(anyelement,integer)
- bloom_agg(anyelement)         | bloom_agg(anyelement,double precision,bigint)
- tdigest_agg(double precision) | tdigest_agg(double precision,integer)
- cmsketch_agg(anyelement)      | cmsketch_agg(anyelement,double precision,double precision)
- fss_agg(anyelement,bigint)    | fss_agg(anyelement,bigint,bigint,bigint)
-(6 rows)
+     oid      |   oid   
+--------------+---------
+ count("any") | count()
+(1 row)
 
 -- For the same reason, built-in aggregates with default arguments are no good.
 SELECT oid, proname
@@ -2220,12 +2068,10 @@ FROM (SELECT indexrelid, indrelid, unnest(indkey) as ikey,
 WHERE a.attrelid = indrelid AND a.attnum = ikey AND opc.oid = iclass AND
       (opcintype != atttypid OR icoll != attcollation)
 ORDER BY 1;
-           indexrelid           |     indrelid     |  attname   | atttypid | opcname 
---------------------------------+------------------+------------+----------+---------
- pg_aggregate_fnoid_index       | pg_aggregate     | aggfnoid   | regproc  | oid_ops
- pipeline_combine_transfn_index | pipeline_combine | aggfinalfn | regproc  | oid_ops
- pipeline_combine_transfn_index | pipeline_combine | transfn    | regproc  | oid_ops
-(3 rows)
+        indexrelid        |   indrelid   | attname  | atttypid | opcname 
+--------------------------+--------------+----------+----------+---------
+ pg_aggregate_fnoid_index | pg_aggregate | aggfnoid | regproc  | oid_ops
+(1 row)
 
 -- Check for system catalogs with collation-sensitive ordering.  This is not
 -- a representational error in pg_index, but simply wrong catalog design.
