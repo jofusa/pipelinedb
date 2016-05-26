@@ -119,8 +119,8 @@ DATA(insert (string_agg_finalfn string_agg_transfn stringaggstatesend stringaggs
 DATA(insert (bytea_string_agg_finalfn bytea_string_agg_transfn stringaggstatesend stringaggstaterecv string_agg_combine 17));
 
 /* json */
-DATA(insert (json_agg_finalfn json_agg_transfn bytearecv byteatostringinfo json_agg_combine 17));
-DATA(insert (json_object_agg_finalfn json_object_agg_transfn bytearecv byteatostringinfo json_object_agg_combine 17));
+DATA(insert (json_agg_finalfn json_agg_transfn jsonaggstatesend jsonaggstaterecv json_agg_combine 17));
+DATA(insert (json_object_agg_finalfn json_object_agg_transfn jsonaggstatesend jsonaggstaterecv json_object_agg_combine 17));
 
 /* binary regression aggregates */
 DATA(insert (0 int8inc_float8_float8 0 0 int8_sum_to_int8 20));
