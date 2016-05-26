@@ -962,3 +962,68 @@ array_positions(PG_FUNCTION_ARGS)
 
 	PG_RETURN_DATUM(makeArrayResult(astate, CurrentMemoryContext));
 }
+
+/*
+ * ARRAY_AGG combine function
+ */
+Datum
+array_agg_combine(PG_FUNCTION_ARGS)
+{
+	ArrayBuildState *result = PG_ARGISNULL(0) ? NULL : (ArrayBuildState *) PG_GETARG_POINTER(0);
+	ArrayBuildState *toappend = PG_ARGISNULL(1) ? NULL : (ArrayBuildState *) PG_GETARG_POINTER(1);
+	MemoryContext aggcontext;
+	int i;
+
+	if (!AggCheckCallContext(fcinfo, &aggcontext))
+	{
+		/* cannot be called directly because of internal-type argument */
+		elog(ERROR, "array_agg_combine called in non-aggregate context");
+	}
+
+	if (toappend == NULL)
+		PG_RETURN_POINTER(result);
+
+	/*
+	 * The incoming arrays will be appended to the existing transition state,
+	 * but the order in which they're appended isn't predictable.
+	 */
+	for (i=0; i<toappend->nelems; i++)
+	{
+		result = accumArrayResult(result,
+				toappend->dvalues[i], toappend->dnulls[i],
+				toappend->element_type, aggcontext);
+	}
+
+	PG_RETURN_POINTER(result);
+}
+
+Datum
+array_agg_array_combine(PG_FUNCTION_ARGS)
+{
+	ArrayBuildStateArr *result = PG_ARGISNULL(0) ? NULL : (ArrayBuildStateArr *) PG_GETARG_POINTER(0);
+	ArrayBuildStateArr *toappend = PG_ARGISNULL(1) ? NULL : (ArrayBuildStateArr *) PG_GETARG_POINTER(1);
+	MemoryContext aggcontext;
+	ArrayType *arr;
+	ArrayIterator it;
+	Datum val;
+	bool isnull;
+
+	if (!AggCheckCallContext(fcinfo, &aggcontext))
+	{
+		/* cannot be called directly because of internal-type argument */
+		elog(ERROR, "array_agg_array_combine called in non-aggregate context");
+	}
+
+	if (toappend == NULL)
+		PG_RETURN_POINTER(result);
+
+	arr = DatumGetArrayTypeP(makeArrayResultArr(toappend, aggcontext, false));
+	it = array_create_iterator(arr, 1, NULL);
+
+	while (array_iterate(it, &val, &isnull))
+		result = accumArrayResultArr(result, val, isnull, toappend->array_type, aggcontext);
+
+	array_free_iterator(it);
+
+	PG_RETURN_POINTER(result);
+}

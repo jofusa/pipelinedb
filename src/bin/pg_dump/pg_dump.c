@@ -13321,7 +13321,7 @@ dumpForeignServer(Archive *fout, ForeignServerInfo *srvinfo)
 
 	/* This is created at initdb time */
 	if (strcmp(srvinfo->dobj.name, "pipeline_streams") == 0)
-		continue;
+		return;
 
 	q = createPQExpBuffer();
 	delq = createPQExpBuffer();
