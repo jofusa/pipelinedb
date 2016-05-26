@@ -137,7 +137,12 @@ StartupDecodingContext(List *output_plugin_options,
 	 * (re-)load output plugins, so we detect a bad (removed) output plugin
 	 * now.
 	 */
-	LoadOutputPlugin(&ctx->callbacks, NameStr(slot->data.plugin));
+	/*
+	 * XXX(jasonm): An empty string means this is not a dynamically
+	 * loaded plugin. We utilise this for continuous triggers.
+	 */
+	if (strlen(slot->data.plugin.data))
+		LoadOutputPlugin(&ctx->callbacks, NameStr(slot->data.plugin));
 
 	/*
 	 * Now that the slot's xmin has been set, we can announce ourselves as a
@@ -421,7 +426,7 @@ CreateDecodingContext(XLogRecPtr start_lsn,
 		startup_cb_wrapper(ctx, &ctx->options, false);
 	MemoryContextSwitchTo(old_context);
 
-	ereport(LOG,
+	ereport(DEBUG1,
 			(errmsg("starting logical decoding for slot \"%s\"",
 					NameStr(slot->data.name)),
 			 errdetail("streaming transactions committing after %X/%X, reading WAL from %X/%X",
