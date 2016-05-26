@@ -1096,6 +1096,9 @@ json_lex_number(JsonLexContext *lex, char *s,
 	for (; len < lex->input_length && JSON_ALPHANUMERIC_CHAR(*s); s++, len++)
 		error = true;
 
+	if (total_len != NULL)
+		*total_len = len;
+
 	if (num_err != NULL)
 	{
 		/* let the caller handle any error */
@@ -1103,6 +1106,7 @@ json_lex_number(JsonLexContext *lex, char *s,
 	}
 	else
 	{
+		/* return token endpoint */
 		lex->prev_token_terminator = lex->token_terminator;
 		lex->token_terminator = s;
 		/* handle error if any */

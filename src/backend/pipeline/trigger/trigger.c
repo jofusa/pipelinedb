@@ -176,6 +176,8 @@ trigger_main()
 
 	CHECK_FOR_INTERRUPTS();
 
+	proc_exit(0);
+
 	CheckContinuousTriggerRequirements(ERROR);
 	wal_init();
 

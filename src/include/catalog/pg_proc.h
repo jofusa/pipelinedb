@@ -5465,7 +5465,7 @@ DATA(insert OID = 4323 ( hll_agg_trans	PGNSP PGUID 12 1 0 0 0 f f f f f f i 2 0 
 DESCR("hyperloglog aggregate");
 
 /* hyperloglog aggregate with p transition function */
-DATA(insert OID = 4324 ( hll_agg_transp	PGNSP PGUID 12 1 0 0 0 f f f f f f i 2 0 3998 "3998 2283 23" _null_ _null_ _null_ _null_ _null_ hll_agg_transp _null_ _null_ _null_ ));
+DATA(insert OID = 4324 ( hll_agg_transp	PGNSP PGUID 12 1 0 0 0 f f f f f f i 3 0 3998 "3998 2283 23" _null_ _null_ _null_ _null_ _null_ hll_agg_transp _null_ _null_ _null_ ));
 DESCR("hyperloglog aggregate");
 
 /* hyperloglog union aggregate */
@@ -5535,7 +5535,7 @@ DATA(insert OID = 4341 ( tdigest_agg_trans	PGNSP PGUID 12 1 0 0 0 f f f f f f i 
 DESCR("t-digest aggregate");
 
 /* t-digest aggregate with compression */
-DATA(insert OID = 4342 ( tdigest_agg_transp	PGNSP PGUID 12 1 0 0 0 f f f f f f i 2 0 5034 "5034 701 23" _null_ _null_ _null_ _null_ _null_ tdigest_agg_transp _null_ _null_ _null_ ));
+DATA(insert OID = 4342 ( tdigest_agg_transp	PGNSP PGUID 12 1 0 0 0 f f f f f f i 3 0 5034 "5034 701 23" _null_ _null_ _null_ _null_ _null_ tdigest_agg_transp _null_ _null_ _null_ ));
 DESCR("t-digest aggregate");
 
 /* t-digest union aggregate */
@@ -5678,10 +5678,10 @@ DESCR("hash one or more values into a 64-bit integer using locality sensitive ha
 DATA(insert OID = 4375 ( stream_stat_get PGNSP PGUID 12 1 1000 0 0 f f f f t t s 0 0 2249 "" "{25,25,20,20,20}" "{o,o,o,o,o}" "{schema,name,input_rows,input_batches,input_bytes}" _null_ _null_ stream_stat_get _null_ _null_ _null_ ));
 DESCR("get stream stats");
 
-DATA(insert OID = 4378 ( pipeline_views PGNSP PGUID 12 1 1000 0 0 f f f f t t s 0 0 2249 "" "{26,25,25,16,25}" "{o,o,o,o,o}" "{id,schema,name,active,query}" _null_ _null_ pipeline_views _null_ _null_ _null_ ));
+DATA(insert OID = 4378 ( pipeline_views PGNSP PGUID 12 1 20 0 0 f f f f t t s 0 0 2249 "" "{26,25,25,16,25}" "{o,o,o,o,o}" "{id,schema,name,active,query}" _null_ _null_ pipeline_views _null_ _null_ _null_ ));
 DESCR("get continuous views");
 
-DATA(insert OID = 4379 ( pipeline_streams PGNSP PGUID 12 1 1000 0 0 f f f f t t s 0 0 2249 "" "{25,25,16,1009,1009}" "{o,o,o,o,o}" "{schema,name,inferred,queries,tup_desc}" _null_ _null_ pipeline_streams _null_ _null_ _null_ ));
+DATA(insert OID = 4379 ( pipeline_streams PGNSP PGUID 12 1 20 0 0 f f f f t t s 0 0 2249 "" "{25,25,16,1009,1009}" "{o,o,o,o,o}" "{schema,name,inferred,queries,tup_desc}" _null_ _null_ pipeline_streams _null_ _null_ _null_ ));
 DESCR("get streams");
 
 /* t-digest add n */
@@ -5750,7 +5750,7 @@ DESCR("filtered space saving increment");
 DATA(insert OID = 4407 (fss_print PGNSP PGUID 12 1 0 0 0 f f f f f f i 1 0 25 "5041" _null_ _null_ _null_ _null_ _null_ fss_print _null_ _null_ _null_ ));
 DESCR("filtered space saving print function");
 /* filtered space saving topk */
-DATA(insert OID = 4408 (fss_topk PGNSP PGUID 12 1 0 0 0 f f f f f t i 1 0 2249 "5041" "{2283,23}" "{o,o}" "{value,frequency}" _null_ _null_ fss_topk _null_ _null_ _null_ ));
+DATA(insert OID = 4408 (fss_topk PGNSP PGUID 12 1 10 0 0 f f f f f t i 1 0 2249 "5041" "{2283,23}" "{o,o}" "{value,frequency}" _null_ _null_ fss_topk _null_ _null_ _null_ ));
 DESCR("filtered space saving top-k function");
 
 DATA(insert OID = 4409 ( pipeline_get_worker_querydef	   PGNSP PGUID 12 1 0 0 0 f f f f t f s 1 0 25 "25" _null_ _null_ _null_ _null_ _null_ pipeline_get_worker_querydef _null_ _null_ _null_ ));
@@ -5912,7 +5912,7 @@ DATA(insert OID = 4478 (  json_object_int_sum_transout PGNSP PGUID 12 1 0 0 0 f 
 DESCR("json_object_sum transition out function");
 
 /* continuous transforms */
-DATA(insert OID = 4479 ( pipeline_transforms PGNSP PGUID 12 1 1000 0 0 f f f f t t s 0 0 2249 "" "{26,25,25,16,25,1009,25}" "{o,o,o,o,o,o,o}" "{id,schema,name,active,tgfn,tgargs,query}" _null_ _null_ pipeline_transforms _null_ _null_ _null_ ));
+DATA(insert OID = 4479 ( pipeline_transforms PGNSP PGUID 12 1 20 0 0 f f f f t t s 0 0 2249 "" "{26,25,25,16,25,1009,25}" "{o,o,o,o,o,o,o}" "{id,schema,name,active,tgfn,tgargs,query}" _null_ _null_ pipeline_transforms _null_ _null_ _null_ ));
 DESCR("get continuous transforms");
 DATA(insert OID = 4480 ( pipeline_stream_insert	PGNSP PGUID 12 1 0 0 0 f f f f t f v 0 0 2279 "" _null_ _null_ _null_ _null_ _null_ pipeline_stream_insert _null_ _null_ _null_ ));
 DESCR("trigger to insert into streams");
