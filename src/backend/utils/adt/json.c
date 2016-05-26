@@ -1874,7 +1874,6 @@ json_agg_transfn(PG_FUNCTION_ARGS)
 				oldcontext;
 	JsonAggState *state;
 	Datum		val;
-	JsonTypeCategory tcategory;
 
 	if (!AggCheckCallContext(fcinfo, &aggcontext))
 	{
@@ -1927,7 +1926,7 @@ json_agg_transfn(PG_FUNCTION_ARGS)
 		(state->val_category == JSONTYPE_ARRAY ||
 		 state->val_category == JSONTYPE_COMPOSITE))
 	{
-		appendStringInfoString(state, "\n ");
+		appendStringInfoString(state->str, "\n ");
 	}
 
 	datum_to_json(val, false, state->str, state->val_category,
@@ -2079,8 +2078,8 @@ json_object_agg_finalfn(PG_FUNCTION_ARGS)
 Datum
 json_agg_combine(PG_FUNCTION_ARGS)
 {
-	JsonAggState state;
-	JsonAggState incoming;
+	JsonAggState *state;
+	JsonAggState *incoming;
 	MemoryContext aggcontext;
 
 	if (!AggCheckCallContext(fcinfo, &aggcontext))
@@ -2103,34 +2102,34 @@ json_agg_combine(PG_FUNCTION_ARGS)
 		state->str = makeStringInfo();
 		MemoryContextSwitchTo(oldcontext);
 
-		appendStringInfoChar(state, '[');
+		appendStringInfoChar(state->str, '[');
 	}
 	else
 	{
-		state = (JsonAggState) PG_GETARG_POINTER(0);
+		state = (JsonAggState *) PG_GETARG_POINTER(0);
 		appendStringInfoString(state->str, ", ");
 	}
 
 	if (!PG_ARGISNULL(1))
 	{
-		incoming = (JsonAggState) PG_GETARG_POINTER(1);
+		incoming = (JsonAggState *) PG_GETARG_POINTER(1);
 
 		/* skip the '[' in the beginning */
 		Assert(incoming->str->data[0] == '[');
-		appendBinaryStringInfo(state, incoming->str->data + 1, incoming->str->len - 1);
+		appendBinaryStringInfo(state->str, incoming->str->data + 1, incoming->str->len - 1);
 	}
 
 	PG_RETURN_POINTER(state);
 }
 
 /*
- *
+ * json_object_agg_combine
  */
 Datum
 json_object_agg_combine(PG_FUNCTION_ARGS)
 {
-	JsonAggState state;
-	JsonAggState incoming;
+	JsonAggState *state;
+	JsonAggState *incoming;
 	MemoryContext aggcontext;
 
 	if (!AggCheckCallContext(fcinfo, &aggcontext))
@@ -2153,21 +2152,21 @@ json_object_agg_combine(PG_FUNCTION_ARGS)
 		state->str = makeStringInfo();
 		MemoryContextSwitchTo(oldcontext);
 
-		appendStringInfoString(state, "{");
+		appendStringInfoString(state->str, "{");
 	}
 	else
 	{
-		state = (JsonAggState) PG_GETARG_POINTER(0);
+		state = (JsonAggState *) PG_GETARG_POINTER(0);
 		appendStringInfoString(state->str, ",");
 	}
 
 	if (!PG_ARGISNULL(1))
 	{
-		incoming = (StringInfo) PG_GETARG_POINTER(1);
+		incoming = (JsonAggState *) PG_GETARG_POINTER(1);
 
 		/* skip the '{' in the beginning */
 		Assert(incoming->str->data[0] == '{');
-		appendBinaryStringInfo(state, incoming->str->data + 1, incoming->str->len - 1);
+		appendBinaryStringInfo(state->str, incoming->str->data + 1, incoming->str->len - 1);
 	}
 
 	PG_RETURN_POINTER(state);
@@ -2176,12 +2175,12 @@ json_object_agg_combine(PG_FUNCTION_ARGS)
 Datum
 jsonaggstatesend(PG_FUNCTION_ARGS)
 {
-	JsonAggState *state;
+	JsonAggState *state = PG_ARGISNULL(0) ? NULL : (JsonAggState *) PG_GETARG_POINTER(0);
 	char *pos;
 	int nbytes;
 	bytea *result;
 
-	if (PG_ARGISNULL(0) || PG_GETARG_POINTER(0) == NULL)
+	if (!state)
 		PG_RETURN_NULL();
 
 	nbytes = sizeof(JsonAggState) + state->str->len;
@@ -2201,7 +2200,6 @@ jsonaggstaterecv(PG_FUNCTION_ARGS)
 {
 	MemoryContext context;
 	MemoryContext old;
-	JsonAggState state;
 	bytea *bytes;
 	int nbytes;
 	char *pos;

@@ -95,10 +95,8 @@ static Node *transformAExprOpAll(ParseState *pstate, A_Expr *a);
 static Node *transformAExprDistinct(ParseState *pstate, A_Expr *a);
 static Node *transformAExprNullIf(ParseState *pstate, A_Expr *a);
 static Node *transformAExprOf(ParseState *pstate, A_Expr *a);
-static Node *transformAExprIn(ParseState *pstate, A_Expr *a);
 static Node *transformAExprBetween(ParseState *pstate, A_Expr *a);
 static Node *transformBoolExpr(ParseState *pstate, BoolExpr *a);
-static Node *transformFuncCall(ParseState *pstate, FuncCall *fn);
 static Node *transformMultiAssignRef(ParseState *pstate, MultiAssignRef *maref);
 static Node *transformCaseExpr(ParseState *pstate, CaseExpr *c);
 static Node *transformSubLink(ParseState *pstate, SubLink *sublink);
@@ -1100,7 +1098,7 @@ transformAExprOf(ParseState *pstate, A_Expr *a)
 	return (Node *) result;
 }
 
-static Node *
+Node *
 transformAExprIn(ParseState *pstate, A_Expr *a)
 {
 	Node	   *result = NULL;
@@ -1406,7 +1404,7 @@ transformBoolExpr(ParseState *pstate, BoolExpr *a)
 	return (Node *) makeBoolExpr(a->boolop, args, a->location);
 }
 
-static Node *
+Node *
 transformFuncCall(ParseState *pstate, FuncCall *fn)
 {
 	List	   *targs;

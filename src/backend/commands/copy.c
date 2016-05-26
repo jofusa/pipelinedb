@@ -40,6 +40,7 @@
 #include "optimizer/clauses.h"
 #include "optimizer/planner.h"
 #include "parser/parse_relation.h"
+#include "pipeline/stream.h"
 #include "nodes/makefuncs.h"
 #include "rewrite/rewriteHandler.h"
 #include "storage/fd.h"

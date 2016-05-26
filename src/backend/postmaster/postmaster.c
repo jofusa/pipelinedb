@@ -3948,6 +3948,8 @@ BackendStartup(Port *port)
 {
 	Backend    *bn;				/* for backend cleanup */
 	pid_t		pid;
+	char		msg[64];
+	char		remote[32];
 
 	/*
 	 * Create backend data structure.  Better before the fork() so we can

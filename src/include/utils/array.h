@@ -357,8 +357,6 @@ extern Datum array_unnest(PG_FUNCTION_ARGS);
 extern Datum array_remove(PG_FUNCTION_ARGS);
 extern Datum array_replace(PG_FUNCTION_ARGS);
 extern Datum width_bucket_array(PG_FUNCTION_ARGS);
-extern Datum arrayaggstatesend(PG_FUNCTION_ARGS);
-extern Datum arrayaggstaterecv(PG_FUNCTION_ARGS);
 
 extern void CopyArrayEls(ArrayType *array,
 			 Datum *values,
